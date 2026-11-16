@@ -11,10 +11,8 @@ export default function App() {
   const [scripts, setScripts] = useState<Script[]>(() => loadScripts());
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [view, setView] = useState<View>('scripts');
-  const [openScriptId, setOpenScriptId] = useState<string | null>(null);
+  const [openScript, setOpenScript] = useState<Script | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-
-  const openScript = scripts.find((s) => s.id === openScriptId) ?? null;
 
   // Apply theme choice: explicit light/dark, or follow the phone's setting.
   useEffect(() => {
@@ -38,7 +36,7 @@ export default function App() {
   };
 
   if (openScript) {
-    return <Reader script={openScript} settings={settings} onExit={() => setOpenScriptId(null)} />;
+    return <Reader script={openScript} settings={settings} onExit={() => setOpenScript(null)} />;
   }
 
   return (
@@ -132,7 +130,7 @@ export default function App() {
         </section>
       )}
 
-      <main>{view === 'scripts' ? <Scripts scripts={scripts} setScripts={setScripts} onOpen={setOpenScriptId} /> : <Recordings />}</main>
+      <main>{view === 'scripts' ? <Scripts scripts={scripts} setScripts={setScripts} onOpen={setOpenScript} /> : <Recordings />}</main>
 
       <footer className="app-footer">
         <p>Your scripts and recordings stay on this device. No account needed.</p>

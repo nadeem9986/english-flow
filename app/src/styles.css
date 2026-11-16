@@ -269,6 +269,72 @@ button {
   background: linear-gradient(transparent, var(--bg));
 }
 
+/* Camera mode: optional front-camera preview behind the reading text */
+
+.camera-feed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror, like a selfie view */
+  z-index: 0;
+}
+
+/* Soft dark fade keeps white text readable over any camera image */
+.camera-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.2) 30%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.6)
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.viewport.camera-on {
+  background: #000;
+  border-radius: 12px;
+}
+
+.viewport.camera-on .content {
+  z-index: 2;
+}
+
+.viewport.camera-on .content p {
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+}
+
+.viewport.camera-on .reading-band {
+  z-index: 3;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.viewport.camera-on .fade {
+  z-index: 4;
+}
+
+.viewport.camera-on .fade-top {
+  background: linear-gradient(rgba(0, 0, 0, 0.85), transparent);
+}
+
+.viewport.camera-on .fade-bottom {
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+}
+
+.viewport.camera-on .countdown {
+  z-index: 5;
+}
+
+.ghost.camera-active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .countdown {
   position: absolute;
   inset: 0;

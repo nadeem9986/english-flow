@@ -17,4 +17,6 @@ No English Flow build has been delivered yet. These are known traps identified d
 | Camera keeps running when toggled off mid-permission-prompt | getUserMedia resolves after the user already cancelled | Track a request id; stop the stream immediately when it resolves stale |
 | White reading text disappears over the camera image | Theme colors reused over a live video background | Force white text plus a dark scrim and text shadow in Camera mode; screenshot-check in both themes |
 
+| GitHub web upload silently renames files instead of replacing | Multi-file upload queue prefixed every file (1-README.md, 6-Reader.tsx); a mis-targeted filename fill containing '/' created a nested garbage path and CI failed on the mangled tree | Never use the upload page for replacements; edit/create one file at a time in the web editor, pick the editor ref by its 'file contents' label (not the filename field), then byte-compare each committed file via API and diff the whole repo tree against the expected file set before delivery |
+
 Review this file before each build; add actual mistakes with cause and a test that prevents recurrence.

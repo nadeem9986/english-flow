@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import type { Script } from './types';
 import { newId, saveScripts, wordCount } from './store';
+import { LESSONS, lessonToScript } from './lessons';
 
 interface Props {
   scripts: Script[];
   setScripts: (s: Script[]) => void;
-  onOpen: (id: string) => void;
+  onOpen: (script: Script) => void;
 }
 
 const SAMPLE: Script = {
@@ -26,11 +27,9 @@ export function Scripts({ scripts, setScripts, onOpen }: Props) {
 
   const save = () => {
     if (!editing || !editing.text.trim()) return;
-    const now = Date.now();
-    const exists = scripts.some((s) => s.id === editing.id);
-    const next = exists
-      ? scripts.map((s) => (s.id === editing.id ? { ...editing, updatedAt: now } : s))
-      : [...scripts, { ...editing, id: editing.id || newId(), createdAt: now, updatedAt: now }];
+    const next = scripts.some((s) => s.id === editing.id)
+      ? scripts.map((s) => (s.id === editing.id ? { ...editing, updatedAt: Date.now() } : s))
+      : [...scripts, { ...editing, id: editing.id || newId(), createdAt: Date.now(), updatedAt: Date.now() }];
     persist(next);
     setEditing(null);
   };
@@ -66,47 +65,68 @@ export function Scripts({ scripts, setScripts, onOpen }: Props) {
 
   return (
     <div className="scripts">
-      {scripts.length === 0 && (
-        <p className="empty">
-          No scripts yet. Add a short passage, then read it aloud, record yourself, and retell it
-          without the text.
-        </p>
-      )}
-      <ul className="script-list">
-        {scripts.map((s) => (
-          <li key={s.id}>
-            <button type="button" className="script-open" onClick={() => onOpen(s.id)}>
-              <span className="script-name">{s.name}</span>
-              <span className="script-meta">{wordCount(s.text)} words</span>
-            </button>
-            <button type="button" className="ghost" onClick={() => setEditing(s)} aria-label={`Edit ${s.name}`}>
-              Edit
-            </button>
-            <button
-              type="button"
-              className="ghost danger"
-              onClick={() => remove(s.id)}
-              aria-label={`Delete ${s.name}`}
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="controls">
-        <button
-          type="button"
-          className="primary"
-          onClick={() => setEditing({ id: newId(), name: '', text: '', createdAt: 0, updatedAt: 0 })}
-        >
-          New script
-        </button>
+      <section className="lessons">
+        <h2 className="section-title">Practice lessons</h2>
+        <p className="section-hint">Ready-made. Tap a lesson, then Start.</p>
+        <ul className="script-list">
+          {LESSONS.map((lesson) => (
+            <li key={lesson.id}>
+              <button type="button" className="script-open" onClick={() => onOpen(lessonToScript(lesson))}>
+                <span className="script-name">{lesson.title}</span>
+                <span className="script-meta">
+                  {wordCount(lesson.text)} words &middot; {lesson.goal}
+                </span>
+                <span className="lesson-source">{lesson.source}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="my-scripts">
+        <h2 className="section-title">My scripts</h2>
         {scripts.length === 0 && (
-          <button type="button" className="ghost" onClick={() => persist([SAMPLE])}>
-            Add sample passage
-          </button>
+          <p className="empty">
+            No scripts of your own yet. Add a short passage, then read it aloud, record yourself,
+            and retell it without the text.
+          </p>
         )}
-      </div>
+        <ul className="script-list">
+          {scripts.map((s) => (
+            <li key={s.id}>
+              <button type="button" className="script-open" onClick={() => onOpen(s)}>
+                <span className="script-name">{s.name}</span>
+                <span className="script-meta">{wordCount(s.text)} words</span>
+              </button>
+              <button type="button" className="ghost" onClick={() => setEditing(s)} aria-label={`Edit ${s.name}`}>
+                Edit
+              </button>
+              <button
+                type="button"
+                className="ghost danger"
+                onClick={() => remove(s.id)}
+                aria-label={`Delete ${s.name}`}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="controls">
+          <button
+            type="button"
+            className="primary"
+            onClick={() => setEditing({ id: newId(), name: '', text: '', createdAt: 0, updatedAt: 0 })}
+          >
+            New script
+          </button>
+          {scripts.length === 0 && (
+            <button type="button" className="ghost" onClick={() => persist([SAMPLE])}>
+              Add sample passage
+            </button>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

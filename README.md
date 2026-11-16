@@ -2,7 +2,7 @@
 
 English speaking practice built around a simple idea: **text moves from bottom to top while you read it aloud.**
 
-**Status:** research and project foundation, 16 November 2026. There is no runnable app, APK, deployment, adopted upstream code or chosen outbound license yet. The repository is private. "English Flow" is a working title, not a cleared brand name.
+**Status:** web prototype v0.1.0 in [`app/`](app/) (React/TypeScript PWA, unit-tested and runtime-verified in desktop Chrome), built on the research and project foundation from 16 November 2026. No APK, store release, adopted upstream code or chosen outbound license yet. "English Flow" is a working title, not a cleared brand name.
 
 ## The proposed practice loop
 
@@ -17,6 +17,7 @@ The teleprompter is the starting point. Reading a script smoothly and speaking s
 
 | Document | Purpose |
 | --- | --- |
+| [app/](app/) | The runnable web prototype: setup, test and verification notes |
 | [SEEDFILE.md](SEEDFILE.md) | Original concept, scope, decisions and unanswered questions |
 | [RESEARCH.md](RESEARCH.md) | Evidence, product direction and ranked technical options |
 | [OSS_SHORTLIST.md](OSS_SHORTLIST.md) | Reuse candidates, licenses and source-level checks |

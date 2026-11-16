@@ -27,3 +27,12 @@ Checked 16 November 2026. Repository pages can change. README features are autho
 Sources span academic evidence, operator/product descriptions, open-source primary repositories and official technical documentation. No independent hands-on review of these particular OSS apps was established, so they are candidates rather than certified reliable dependencies. The study evidence is limited and does not validate this new product. API/model performance, accessibility and accent fairness remain implementation-stage checks. Dependencies/fonts/assets, trademarks, store policies and legal compliance have not received a complete audit.
 
 Two leading repositories were shallow-cloned only for source inspection. Their code was not copied into English Flow. Upstream copyright/license texts were read directly for TiefPrompt, jlecomte and Smart Teleprompter. Other license rows distinguish repository metadata/README evidence from a full legal review.
+
+## Practice lesson content (17 November 2026)
+
+Built-in practice lessons live in `app/src/lessons.ts`. Lesson texts are original except the Rainbow Passage excerpt (public domain). Lesson notes describe teaching rationale; none claim sentence-specific efficacy.
+
+| ID | Title / publisher | URL | Type and date | Claim used / confidence |
+| --- | --- | --- | --- | --- |
+| S18 | The Rainbow Passage, IDEA: International Dialects of English Archive | https://www.dialectsarchive.com/the-rainbow-passage | Archive page, fetched 17 November 2026 | Passage text and IDEA's statement that it is "a public-domain text" from Fairbanks, Voice and Articulation Drillbook (Harper & Row, 2nd ed.), used as a standard elicitation passage. High confidence for text and public-domain statement |
+| S19 | Does perceptual high variability phonetic training improve L2 speech production? A meta-analysis, Applied Psycholinguistics (Cambridge) | https://www.cambridge.org/core/journals/applied-psycholinguistics/article/does-perceptual-high-variability-phonetic-training-improve-l2-speech-production-a-metaanalysis-of-perceptionproduction-connection/E38D8F5CE65DC708137B0E95F97C6BC7 | Meta-analysis, 2023 | Background that structured sound-contrast practice can support L2 pronunciation. Not a claim about these particular sentences; the app copy says "standard technique" only |

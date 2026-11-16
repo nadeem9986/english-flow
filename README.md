@@ -2,7 +2,7 @@
 
 English speaking practice built around a simple idea: **text moves from bottom to top while you read it aloud.**
 
-**Status:** web prototype v0.1.0 in [`app/`](app/) (React/TypeScript PWA, unit-tested and runtime-verified in desktop Chrome), built on the research and project foundation from 16 November 2026. No APK, store release, adopted upstream code or chosen outbound license yet. "English Flow" is a working title, not a cleared brand name.
+**Status:** web prototype v0.3.0 in [`app/`](app/) (React/TypeScript PWA, unit-tested and runtime-verified in desktop Chrome), built on the research and project foundation from 16 November 2026. No APK, store release, adopted upstream code or chosen outbound license yet. "English Flow" is a working title, not a cleared brand name.
 
 ## The proposed practice loop
 

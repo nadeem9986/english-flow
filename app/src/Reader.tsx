@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Script, Settings } from './types';
 import { readingDurationSeconds, wordCount } from './store';
 import { useRecorder } from './useRecorder';
+import { useCamera } from './useCamera';
 
 interface Props {
   script: Script;
@@ -22,6 +23,7 @@ export function Reader({ script, settings, onExit }: Props) {
   const lastTickRef = useRef(0);
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
   const recorder = useRecorder();
+  const camera = useCamera();
 
   const words = useMemo(() => wordCount(script.text), [script.text]);
   const durationSec = useMemo(() => readingDurationSeconds(words, settings.wpm), [words, settings.wpm]);
@@ -157,6 +159,18 @@ export function Reader({ script, settings, onExit }: Props) {
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
   };
 
+  // Attach the camera stream to the <video> as soon as either appears.
+  const setCameraVideo = useCallback(
+    (el: HTMLVideoElement | null) => {
+      if (el && camera.stream && el.srcObject !== camera.stream) {
+        el.srcObject = camera.stream;
+        el.play().catch(() => undefined);
+      }
+    },
+    [camera.stream],
+  );
+
+  const cameraOn = camera.stream !== null;
   const inReader = phase !== 'retell';
 
   return (
@@ -173,10 +187,16 @@ export function Reader({ script, settings, onExit }: Props) {
 
       {inReader ? (
         <div
-          className="viewport"
+          className={cameraOn ? 'viewport camera-on' : 'viewport'}
           ref={viewportRef}
           style={{ fontSize: settings.fontSize, lineHeight: settings.lineHeight }}
         >
+          {cameraOn && (
+            <>
+              <video className="camera-feed" ref={setCameraVideo} autoPlay playsInline muted aria-label="Front camera preview" />
+              <div className="camera-scrim" aria-hidden="true" />
+            </>
+          )}
           <div className="reading-band" aria-hidden="true" />
           <div className="content" ref={contentRef}>
             {script.text.split(/\n+/).map((para, i) => (
@@ -232,7 +252,17 @@ export function Reader({ script, settings, onExit }: Props) {
             Show script
           </button>
         )}
+        <button
+          type="button"
+          className={cameraOn ? 'ghost camera-active' : 'ghost'}
+          disabled={camera.state === 'requesting'}
+          aria-pressed={cameraOn}
+          onClick={camera.toggle}
+        >
+          {camera.state === 'requesting' ? 'Starting camera\u2026' : cameraOn ? 'Camera off' : 'Camera'}
+        </button>
       </div>
+      {camera.error && <p className="error">{camera.error}</p>}
 
       <div className="record-bar">
         {recorder.state === 'recording' ? (

@@ -1,0 +1,26 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+key.properties
+local.properties
+# Generated artifacts
+build/
+dist/
+node_modules/
+.dart_tool/
+.flutter-plugins*
+coverage/
+# Personal recordings and local stores
+recordings/
+*.wav
+*.m4a
+*.mp3
+*.pcm
+*.sqlite
+*.db
+# OS/editor files
+.DS_Store
+.idea/

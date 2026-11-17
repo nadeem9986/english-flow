@@ -15,8 +15,8 @@ export default defineConfig({
         name: 'English Flow',
         short_name: 'English Flow',
         description: 'Read aloud, listen back, and retell in your own words.',
-        theme_color: '#0f1115',
-        background_color: '#0f1115',
+        theme_color: '#101411',
+        background_color: '#101411',
         display: 'standalone',
         start_url: './',
         icons: [

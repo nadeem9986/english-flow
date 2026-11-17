@@ -42,3 +42,29 @@ export function cameraErrorMessage(err: unknown): string {
   }
   return 'Could not open the camera. The normal reader still works.';
 }
+
+/**
+ * One-line, human-readable summary of the stream the browser actually
+ * delivered (track settings), not the hints we asked for. Used for the small
+ * camera-details readout so real device behavior can be checked without
+ * sharing a photo. Nothing is stored or sent anywhere.
+ */
+export function describeCameraStream(
+  settings: Partial<MediaTrackSettings> | null | undefined,
+  capabilities?: Partial<MediaTrackCapabilities> | null,
+  label?: string | null,
+): string {
+  const parts: string[] = [];
+  if (settings?.width && settings?.height) {
+    parts.push(`Delivered ${settings.width}\u00d7${settings.height}`);
+  } else {
+    parts.push('Delivered size unknown');
+  }
+  if (settings?.frameRate) parts.push(`${Math.round(settings.frameRate)} fps`);
+  if (settings?.facingMode) parts.push(String(settings.facingMode));
+  const maxW = (capabilities?.width as { max?: number } | undefined)?.max;
+  const maxH = (capabilities?.height as { max?: number } | undefined)?.max;
+  if (maxW && maxH) parts.push(`max offered ${maxW}\u00d7${maxH}`);
+  if (label) parts.push(label);
+  return parts.join(' \u00b7 ');
+}

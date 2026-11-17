@@ -653,3 +653,14 @@ input[type='range'] {
   color: var(--muted);
   font-size: 0.78rem;
 }
+
+/* Small readout of what the camera actually delivered (selectable for easy reading out) */
+.camera-details {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted, inherit);
+  opacity: 0.85;
+  user-select: text;
+  word-break: break-word;
+}

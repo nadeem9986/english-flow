@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CAMERA_CONSTRAINTS, cameraErrorMessage, isCameraSupported } from './camera';
+import { CAMERA_CONSTRAINTS, cameraErrorMessage, describeCameraStream, isCameraSupported } from './camera';
 
 describe('CAMERA_CONSTRAINTS', () => {
   it('asks for the front camera at HD quality, as hints rather than hard requirements', () => {
@@ -57,5 +57,21 @@ describe('cameraErrorMessage', () => {
     for (const name of ['NotAllowedError', 'NotFoundError', 'NotReadableError', 'Other']) {
       expect(cameraErrorMessage({ name })).not.toMatch(/record/i);
     }
+  });
+});
+
+describe('describeCameraStream', () => {
+  it('reports the delivered size, fps, facing and the camera maximum', () => {
+    const text = describeCameraStream(
+      { width: 1280, height: 720, frameRate: 29.97, facingMode: 'user' },
+      { width: { max: 4000 }, height: { max: 3000 } } as Partial<MediaTrackCapabilities>,
+      'camera2 1, facing front',
+    );
+    expect(text).toBe('Delivered 1280\u00d7720 \u00b7 30 fps \u00b7 user \u00b7 max offered 4000\u00d73000 \u00b7 camera2 1, facing front');
+  });
+
+  it('degrades gracefully when the browser reports nothing', () => {
+    expect(describeCameraStream(null)).toBe('Delivered size unknown');
+    expect(describeCameraStream({})).toBe('Delivered size unknown');
   });
 });

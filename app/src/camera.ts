@@ -66,5 +66,26 @@ export function describeCameraStream(
   const maxH = (capabilities?.height as { max?: number } | undefined)?.max;
   if (maxW && maxH) parts.push(`max offered ${maxW}\u00d7${maxH}`);
   if (label) parts.push(label);
+  // Focus/zoom are only shown when this browser actually reports them.
+  const s2 = settings as { focusMode?: string; focusDistance?: number; zoom?: number } | null | undefined;
+  const c2 = capabilities as { focusMode?: string[] } | null | undefined;
+  if (s2?.focusMode) parts.push(`focus ${s2.focusMode}`);
+  else if (c2?.focusMode?.length) parts.push(`focus modes ${c2.focusMode.join('/')}`);
+  if (typeof s2?.focusDistance === 'number') parts.push(`focus dist ${s2.focusDistance.toFixed(2)}`);
+  if (typeof s2?.zoom === 'number') parts.push(`zoom ${s2.zoom}`);
   return parts.join(' \u00b7 ');
+}
+
+/**
+ * Continuous autofocus constraint, only when the track's capabilities list it
+ * and it is not already active. Returns null otherwise (nothing is forced).
+ */
+export function continuousFocusConstraint(
+  settings: Partial<MediaTrackSettings> | null | undefined,
+  capabilities: Partial<MediaTrackCapabilities> | null | undefined,
+): MediaTrackConstraints | null {
+  const modes = (capabilities as { focusMode?: string[] } | null | undefined)?.focusMode;
+  const current = (settings as { focusMode?: string } | null | undefined)?.focusMode;
+  if (!Array.isArray(modes) || !modes.includes('continuous') || current === 'continuous') return null;
+  return { advanced: [{ focusMode: 'continuous' } as MediaTrackConstraintSet] };
 }

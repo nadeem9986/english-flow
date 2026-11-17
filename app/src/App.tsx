@@ -14,13 +14,16 @@ export default function App() {
   const [openScript, setOpenScript] = useState<Script | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('dark');
+  const [phoneTheme, setPhoneTheme] = useState<'light' | 'dark'>('dark');
 
   // Apply theme choice: explicit light/dark, or follow the phone's setting.
   useEffect(() => {
     const root = document.documentElement;
     const media = window.matchMedia('(prefers-color-scheme: light)');
     const apply = () => {
-      const theme = settings.theme === 'system' ? (media.matches ? 'light' : 'dark') : settings.theme;
+      const phone = media.matches ? 'light' : 'dark';
+      setPhoneTheme(phone);
+      const theme = settings.theme === 'system' ? phone : settings.theme;
       root.dataset.theme = theme;
       setEffectiveTheme(theme);
     };
@@ -51,7 +54,11 @@ export default function App() {
           type="button"
           className="theme-toggle"
           aria-label={effectiveTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          onClick={() => updateSettings({ theme: effectiveTheme === 'light' ? 'dark' : 'light' })}
+          onClick={() => {
+            // Choosing what the phone already uses goes back to "Follow phone" instead of pinning it.
+            const target = effectiveTheme === 'light' ? 'dark' : 'light';
+            updateSettings({ theme: target === phoneTheme ? 'system' : target });
+          }}
         >
           <svg className="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
@@ -143,6 +150,10 @@ export default function App() {
               <option value="light">Light</option>
             </select>
           </label>
+          <p className="hint" aria-label="Theme details">
+            Phone reports {phoneTheme} mode &middot; saved choice:{' '}
+            {settings.theme === 'system' ? 'Follow phone' : settings.theme} &middot; showing {effectiveTheme}
+          </p>
           <label>
             Countdown: {settings.countdownSeconds}s
             <input

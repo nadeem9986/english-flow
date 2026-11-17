@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CAMERA_CONSTRAINTS, cameraErrorMessage, describeCameraStream, isCameraSupported } from './camera';
+import { CAMERA_CONSTRAINTS, cameraErrorMessage, describeCameraStream, continuousFocusConstraint, isCameraSupported } from './camera';
 
 describe('CAMERA_CONSTRAINTS', () => {
   it('asks for the front camera at HD quality, as hints rather than hard requirements', () => {
@@ -73,5 +73,19 @@ describe('describeCameraStream', () => {
   it('degrades gracefully when the browser reports nothing', () => {
     expect(describeCameraStream(null)).toBe('Delivered size unknown');
     expect(describeCameraStream({})).toBe('Delivered size unknown');
+  });
+});
+
+describe('focus reporting and request', () => {
+  it('shows focus info only when reported', () => {
+    expect(describeCameraStream({ width: 1, height: 2, focusMode: 'continuous' } as never)).toBe('Delivered 1\u00d72 \u00b7 focus continuous');
+    expect(describeCameraStream({ width: 1, height: 2 }, { focusMode: ['manual', 'continuous'] } as never)).toBe('Delivered 1\u00d72 \u00b7 focus modes manual/continuous');
+  });
+  it('requests continuous focus only when listed and not already on', () => {
+    expect(continuousFocusConstraint({}, { focusMode: ['manual', 'continuous'] } as never)).not.toBeNull();
+    expect(continuousFocusConstraint({ focusMode: 'continuous' } as never, { focusMode: ['continuous'] } as never)).toBeNull();
+    expect(continuousFocusConstraint({}, { focusMode: ['manual'] } as never)).toBeNull();
+    expect(continuousFocusConstraint({}, {})).toBeNull();
+    expect(continuousFocusConstraint(null, null)).toBeNull();
   });
 });

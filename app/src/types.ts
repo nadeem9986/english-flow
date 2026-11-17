@@ -34,4 +34,6 @@ export interface RecordingMeta {
   createdAt: number;
   durationMs: number;
   mimeType: string;
+  /** True when the recording also holds the camera video. Absent on older audio-only recordings. */
+  hasVideo?: boolean;
 }

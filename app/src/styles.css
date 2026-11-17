@@ -1,23 +1,33 @@
+/* English Flow — visual system aligned with the Morse Trainer app.
+   Palette, centered spaced heading, sun/moon theme control and 220ms
+   color tweens mirror dev.n4deem.morse (MainActivity.kt palettes). */
+
 :root {
   color-scheme: dark;
-  --bg: #0f1115;
-  --surface: #171b22;
-  --text: #e8eaee;
-  --muted: #9aa3b0;
-  --accent: #d4a94e;
-  --accent-contrast: #14161a;
+  --bg: #101411;
+  --surface: #191f1a;
+  --surface-2: #212820;
+  --text: #ece7d6;
+  --muted: #bac1b8;
+  --accent: #e2c484;
+  --accent-contrast: #101411;
+  --success: #a8d79b;
   --danger: #d4695e;
+  --line: color-mix(in srgb, var(--accent) 22%, transparent);
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #f6f5f1;
-  --surface: #ffffff;
-  --text: #1c1f26;
-  --muted: #5d6672;
-  --accent: #a97f22;
-  --accent-contrast: #ffffff;
+  --bg: #fffbf2;
+  --surface: #f3eddf;
+  --surface-2: #faf5e8;
+  --text: #2e2c1e;
+  --muted: #4f584e;
+  --accent: #684a10;
+  --accent-contrast: #fffbf2;
+  --success: #28602a;
   --danger: #b0413e;
 }
 
@@ -36,6 +46,28 @@ button {
   color: inherit;
 }
 
+/* Smooth theme change: same 220ms tween as the Morse app. */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  .tab,
+  .settings,
+  .script-list li,
+  .rec-item,
+  .empty,
+  .primary,
+  .ghost,
+  .name-input,
+  .editor textarea,
+  .badge,
+  .theme-toggle,
+  .header-divider {
+    transition:
+      background-color 220ms ease,
+      color 220ms ease,
+      border-color 220ms ease;
+  }
+}
+
 .app {
   max-width: 720px;
   margin: 0 auto;
@@ -45,39 +77,128 @@ button {
   flex-direction: column;
 }
 
+/* Header: centered, spaced, monospace — the Morse heading treatment. */
+
+.app-header {
+  position: relative;
+  text-align: center;
+  padding: 6px 56px 0;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
 .app-header h1 {
-  margin: 8px 0 0;
-  font-size: 1.6rem;
-  letter-spacing: 0.04em;
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: 1.55rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
 .tagline {
-  margin: 4px 0 16px;
+  margin: 6px 0 14px;
   color: var(--muted);
+  font-size: 0.9rem;
 }
+
+/* Sun/moon theme control, top-right like Morse. Rotates 180° on toggle. */
+
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 220ms ease;
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+  grid-area: 1 / 1;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.theme-toggle .icon-sun {
+  opacity: 0;
+  transform: rotate(-180deg) scale(0.5);
+}
+
+.theme-toggle .icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+:root[data-theme='light'] .theme-toggle .icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+:root[data-theme='light'] .theme-toggle .icon-moon {
+  opacity: 0;
+  transform: rotate(180deg) scale(0.5);
+}
+
+.theme-toggle:active {
+  transform: scale(0.94);
+}
+
+/* Tabs as chips, gold on the active one — the Morse FilterChip look. */
 
 .tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 6px;
+  margin-bottom: 0;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .tab {
-  background: var(--surface);
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 16px;
   color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .tab.active {
-  color: var(--text);
+  color: var(--accent);
   border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.header-divider {
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  margin: 0 0 14px;
 }
 
 .settings {
   background: var(--surface);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   padding: 12px 16px;
   margin-bottom: 12px;
   display: grid;
@@ -89,6 +210,19 @@ button {
   gap: 4px;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+.settings select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+input[type='range'] {
+  accent-color: var(--accent);
 }
 
 .script-list,
@@ -105,8 +239,25 @@ button {
   gap: 8px;
   align-items: center;
   background: var(--surface);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   padding: 8px 12px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .script-list li,
+  .rec-item {
+    transition:
+      background-color 220ms ease,
+      border-color 220ms ease,
+      transform 160ms ease;
+  }
+
+  .script-list li:hover,
+  .rec-item:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    transform: translateY(-1px);
+  }
 }
 
 .script-open {
@@ -117,6 +268,7 @@ button {
   display: grid;
   gap: 2px;
   padding: 8px 0;
+  cursor: pointer;
 }
 
 .script-name {
@@ -132,7 +284,8 @@ button {
 .empty {
   color: var(--muted);
   background: var(--surface);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   padding: 16px;
 }
 
@@ -147,9 +300,10 @@ button {
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 18px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .primary:disabled {
@@ -158,15 +312,36 @@ button {
 
 .ghost {
   background: none;
-  border: 1px solid var(--muted);
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 8px 14px;
   color: var(--text);
+  cursor: pointer;
+}
+
+.ghost:disabled {
+  opacity: 0.5;
 }
 
 .ghost.danger {
   border-color: var(--danger);
   color: var(--danger);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .primary,
+  .ghost {
+    transition:
+      background-color 220ms ease,
+      color 220ms ease,
+      border-color 220ms ease,
+      transform 120ms ease;
+  }
+
+  .primary:not(:disabled):active,
+  .ghost:not(:disabled):active {
+    transform: scale(0.97);
+  }
 }
 
 .editor {
@@ -179,10 +354,20 @@ button {
   width: 100%;
   background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--muted);
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 10px 12px;
   font: inherit;
+}
+
+.name-input:focus-visible,
+.editor textarea:focus-visible,
+.tab:focus-visible,
+.primary:focus-visible,
+.ghost:focus-visible,
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Reader */
@@ -194,6 +379,7 @@ button {
   display: flex;
   flex-direction: column;
   padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+  transition: background-color 220ms ease;
 }
 
 .reader-top {
@@ -248,6 +434,7 @@ button {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   pointer-events: none;
   z-index: 1;
+  transition: border-color 220ms ease;
 }
 
 .fade {
@@ -297,7 +484,7 @@ button {
 
 .viewport.camera-on {
   background: #000;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .viewport.camera-on .content {
@@ -342,6 +529,7 @@ button {
   place-items: center;
   font-size: 6rem;
   font-weight: 700;
+  font-family: var(--mono);
   color: var(--accent);
   z-index: 3;
 }
@@ -395,7 +583,8 @@ button {
 
 .rec-item {
   background: var(--surface);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   padding: 12px;
   display: grid;
   gap: 6px;
@@ -445,7 +634,11 @@ button {
 
 .section-title {
   margin: 14px 0 4px;
-  font-size: 1rem;
+  font-size: 0.8rem;
+  font-family: var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .section-hint {

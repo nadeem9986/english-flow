@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CAMERA_CONSTRAINTS, cameraErrorMessage, isCameraSupported } from './camera';
+import { CAMERA_CONSTRAINTS, cameraErrorMessage, describeCameraStream, isCameraSupported } from './camera';
 
 export type CameraState = 'off' | 'requesting' | 'on' | 'error';
 
@@ -72,5 +72,15 @@ export function useCamera() {
     };
   }, [stop]);
 
-  return { state, error, stream, toggle };
+  // What the browser actually delivered (track settings), for the readout.
+  const details = stream
+    ? (() => {
+        const track = stream.getVideoTracks()[0];
+        if (!track) return null;
+        const caps = typeof track.getCapabilities === 'function' ? track.getCapabilities() : null;
+        return describeCameraStream(track.getSettings(), caps, track.label);
+      })()
+    : null;
+
+  return { state, error, stream, details, toggle };
 }

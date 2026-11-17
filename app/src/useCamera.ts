@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CAMERA_CONSTRAINTS, cameraErrorMessage, describeCameraStream, isCameraSupported } from './camera';
+import { CAMERA_CONSTRAINTS, cameraErrorMessage, continuousFocusConstraint, describeCameraStream, isCameraSupported } from './camera';
 
 export type CameraState = 'off' | 'requesting' | 'on' | 'error';
 
@@ -15,6 +15,7 @@ export function useCamera() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const requestIdRef = useRef(0);
+  const [, setTick] = useState(0);
 
   const stop = useCallback(() => {
     requestIdRef.current += 1; // cancel any in-flight permission request
@@ -50,6 +51,17 @@ export function useCamera() {
     streamRef.current = s;
     setStream(s);
     setState('on');
+    // Ask for continuous autofocus only if this track lists it; never fatal.
+    const track = s.getVideoTracks()[0];
+    try {
+      const caps = typeof track?.getCapabilities === 'function' ? track.getCapabilities() : null;
+      const focus = continuousFocusConstraint(track?.getSettings(), caps);
+      if (track && focus) {
+        track.applyConstraints(focus).then(() => setTick((n) => n + 1)).catch(() => undefined);
+      }
+    } catch {
+      /* focus control unavailable: keep the stream as delivered */
+    }
   }, []);
 
   const toggle = useCallback(() => {

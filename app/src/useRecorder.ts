@@ -2,15 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RecordingKind, RecordingMeta } from './types';
 import { newId } from './store';
 import { putRecording } from './db';
+import { combineStream, pickRecordingMime } from './recording';
 
 export type RecorderState = 'idle' | 'requesting' | 'recording' | 'saving' | 'error';
-
-const PREFERRED_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
-
-function pickMimeType(): string {
-  if (typeof MediaRecorder === 'undefined') return '';
-  return PREFERRED_TYPES.find((t) => MediaRecorder.isTypeSupported(t)) ?? '';
-}
 
 export function useRecorder() {
   const [state, setState] = useState<RecorderState>('idle');
@@ -18,12 +12,15 @@ export function useRecorder() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const micRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const startedAtRef = useRef(0);
   const timerRef = useRef<number | null>(null);
 
   const stopTracks = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    // Stop only the microphone this hook opened. The camera hook owns its video track.
+    micRef.current?.getTracks().forEach((t) => t.stop());
+    micRef.current = null;
     streamRef.current = null;
   }, []);
 
@@ -39,7 +36,12 @@ export function useRecorder() {
   }, []);
 
   const start = useCallback(
-    async (scriptId: string | null, scriptName: string, kind: RecordingKind): Promise<void> => {
+    async (
+      scriptId: string | null,
+      scriptName: string,
+      kind: RecordingKind,
+      videoTrack: MediaStreamTrack | null = null,
+    ): Promise<void> => {
       setError(null);
       if (typeof MediaRecorder === 'undefined') {
         setState('error');
@@ -47,16 +49,19 @@ export function useRecorder() {
         return;
       }
       setState('requesting');
-      let stream: MediaStream;
+      const withVideo = videoTrack !== null && videoTrack.readyState === 'live';
+      let mic: MediaStream;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mic = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch {
         setState('error');
         setError('Microphone permission denied. Recording stays optional; allow the mic to use it.');
         return;
       }
+      micRef.current = mic;
+      const stream = withVideo ? combineStream(mic, videoTrack) : mic;
       streamRef.current = stream;
-      const mimeType = pickMimeType();
+      const mimeType = pickRecordingMime(withVideo, (t) => MediaRecorder.isTypeSupported(t));
       const rec = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current = rec;
       chunksRef.current = [];
@@ -67,7 +72,7 @@ export function useRecorder() {
       };
       rec.onstop = () => {
         const durationMs = Date.now() - startedAtRef.current;
-        const blob = new Blob(chunksRef.current, { type: rec.mimeType || 'audio/webm' });
+        const blob = new Blob(chunksRef.current, { type: rec.mimeType || (withVideo ? 'video/webm' : 'audio/webm') });
         chunksRef.current = [];
         stopTracks();
         if (blob.size === 0) {
@@ -82,6 +87,7 @@ export function useRecorder() {
           createdAt: Date.now(),
           durationMs,
           mimeType: blob.type,
+          ...(withVideo ? { hasVideo: true } : {}),
         };
         setState('saving');
         putRecording(meta, blob)

@@ -260,7 +260,7 @@ export function Reader({ script, settings, onExit }: Props) {
         <button
           type="button"
           className={cameraOn ? 'ghost camera-active' : 'ghost'}
-          disabled={camera.state === 'requesting'}
+          disabled={camera.state === 'requesting' || recorder.state === 'recording'}
           aria-pressed={cameraOn}
           onClick={camera.toggle}
         >
@@ -290,7 +290,24 @@ export function Reader({ script, settings, onExit }: Props) {
             disabled={recorder.state === 'requesting' || recorder.state === 'saving'}
             onClick={() => recorder.start(script.id, script.name, phase === 'retell' ? 'retell' : 'scripted')}
           >
-            {recorder.state === 'requesting' ? 'Asking for mic&hellip;' : 'Record this attempt'}
+            {recorder.state === 'requesting' ? 'Asking for mic\u2026' : 'Record this attempt'}
+          </button>
+        )}
+        {recorder.state !== 'recording' && cameraOn && (
+          <button
+            type="button"
+            className="ghost"
+            disabled={recorder.state === 'requesting' || recorder.state === 'saving'}
+            onClick={() =>
+              recorder.start(
+                script.id,
+                script.name,
+                phase === 'retell' ? 'retell' : 'scripted',
+                camera.stream?.getVideoTracks()[0] ?? null,
+              )
+            }
+          >
+            Record with camera
           </button>
         )}
         {recorder.state === 'saving' && <span>Saving&hellip;</span>}

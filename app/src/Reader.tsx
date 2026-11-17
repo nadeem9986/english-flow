@@ -171,6 +171,11 @@ export function Reader({ script, settings, onExit }: Props) {
   );
 
   const cameraOn = camera.stream !== null;
+  const [videoSize, setVideoSize] = useState('');
+  const readVideoSize = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const v = e.currentTarget;
+    setVideoSize(v.videoWidth && v.videoHeight ? `${v.videoWidth}\u00d7${v.videoHeight}` : '');
+  };
   const inReader = phase !== 'retell';
 
   return (
@@ -193,7 +198,7 @@ export function Reader({ script, settings, onExit }: Props) {
         >
           {cameraOn && (
             <>
-              <video className="camera-feed" ref={setCameraVideo} autoPlay playsInline muted aria-label="Front camera preview" />
+              <video className="camera-feed" ref={setCameraVideo} onLoadedMetadata={readVideoSize} onResize={readVideoSize} autoPlay playsInline muted aria-label="Front camera preview" />
               <div className="camera-scrim" aria-hidden="true" />
             </>
           )}
@@ -263,6 +268,12 @@ export function Reader({ script, settings, onExit }: Props) {
         </button>
       </div>
       {camera.error && <p className="error">{camera.error}</p>}
+      {cameraOn && camera.details && (
+        <p className="camera-details" aria-label="Camera details">
+          {camera.details}
+          {videoSize ? ` \u00b7 showing ${videoSize}` : ''}
+        </p>
+      )}
 
       <div className="record-bar">
         {recorder.state === 'recording' ? (

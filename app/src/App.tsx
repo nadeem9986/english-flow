@@ -13,6 +13,7 @@ export default function App() {
   const [view, setView] = useState<View>('scripts');
   const [openScript, setOpenScript] = useState<Script | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('dark');
 
   // Apply theme choice: explicit light/dark, or follow the phone's setting.
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function App() {
     const apply = () => {
       const theme = settings.theme === 'system' ? (media.matches ? 'light' : 'dark') : settings.theme;
       root.dataset.theme = theme;
+      setEffectiveTheme(theme);
     };
     apply();
     media.addEventListener('change', apply);
@@ -42,8 +44,30 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
+        <p className="eyebrow">READ ALOUD / 001</p>
         <h1>English Flow</h1>
         <p className="tagline">Read aloud. Listen back. Retell without the script.</p>
+        <button
+          type="button"
+          className="theme-toggle"
+          aria-label={effectiveTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          onClick={() => updateSettings({ theme: effectiveTheme === 'light' ? 'dark' : 'light' })}
+        >
+          <svg className="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
+            <line x1="12" y1="1.8" x2="12" y2="4.4" />
+            <line x1="12" y1="19.6" x2="12" y2="22.2" />
+            <line x1="1.8" y1="12" x2="4.4" y2="12" />
+            <line x1="19.6" y1="12" x2="22.2" y2="12" />
+            <line x1="4.8" y1="4.8" x2="6.6" y2="6.6" />
+            <line x1="17.4" y1="17.4" x2="19.2" y2="19.2" />
+            <line x1="4.8" y1="19.2" x2="6.6" y2="17.4" />
+            <line x1="17.4" y1="6.6" x2="19.2" y2="4.8" />
+          </svg>
+          <svg className="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.6 14.2A8.8 8.8 0 0 1 9.8 3.4a.7.7 0 0 0-.9-.9 10.2 10.2 0 1 0 12.6 12.6.7.7 0 0 0-.9-.9Z" />
+          </svg>
+        </button>
       </header>
 
       <nav className="tabs">
@@ -71,6 +95,8 @@ export default function App() {
           Settings
         </button>
       </nav>
+
+      <hr className="header-divider" />
 
       {showSettings && (
         <section className="settings">

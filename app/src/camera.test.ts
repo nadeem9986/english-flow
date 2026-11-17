@@ -2,8 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { CAMERA_CONSTRAINTS, cameraErrorMessage, isCameraSupported } from './camera';
 
 describe('CAMERA_CONSTRAINTS', () => {
-  it('asks for the front camera', () => {
-    expect(CAMERA_CONSTRAINTS.video).toEqual({ facingMode: 'user' });
+  it('asks for the front camera at HD quality, as hints rather than hard requirements', () => {
+    const video = CAMERA_CONSTRAINTS.video as MediaTrackConstraints;
+    expect(video.facingMode).toBe('user');
+    // ideal values raise phone previews from the VGA default toward 1080p
+    // while never throwing OverconstrainedError on weaker cameras.
+    expect(video.width).toEqual({ ideal: 1920 });
+    expect(video.height).toEqual({ ideal: 1080 });
+    expect(video.frameRate).toEqual({ ideal: 30 });
+    expect(video).not.toHaveProperty('exact');
+    expect(video.width).not.toHaveProperty('exact');
+    expect(video.height).not.toHaveProperty('exact');
   });
 
   it('never requests audio, so the mic stays free for the recorder', () => {

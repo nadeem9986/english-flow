@@ -3,9 +3,20 @@
 /**
  * Front camera, video only. Audio stays with the recorder so turning the
  * camera on never grabs the microphone or conflicts with an active recording.
+ *
+ * Phones default to VGA when no size is requested, which looks soft when the
+ * preview is stretched full-screen. Ask for HD as `ideal` values: capable
+ * cameras (e.g. a 1080p phone selfie cam) deliver the sharper stream, weaker
+ * ones fall back to their best mode instead of failing with
+ * OverconstrainedError.
  */
 export const CAMERA_CONSTRAINTS: MediaStreamConstraints = {
-  video: { facingMode: 'user' },
+  video: {
+    facingMode: 'user',
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    frameRate: { ideal: 30 },
+  },
   audio: false,
 };
 

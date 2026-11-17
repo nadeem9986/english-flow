@@ -43,7 +43,6 @@ for (const scheme of ['light', 'dark']) {
   console.log(scheme, 'camera track after stop (want live):', after.previewTrackLive);
   // Inspect saved record in IndexedDB.
   const rec = await page.evaluate(() => new Promise((res) => {
-    const o = indexedDB.databases ? null : null;
     indexedDB.databases().then(async (dbs) => {
       const out = [];
       for (const d of dbs) {

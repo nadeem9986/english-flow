@@ -18,6 +18,8 @@ No English Flow build has been delivered yet. These are known traps identified d
 | White reading text disappears over the camera image | Theme colors reused over a live video background | Force white text plus a dark scrim and text shadow in Camera mode; screenshot-check in both themes |
 | Camera preview looks soft or blocky on phones | getUserMedia requested with only facingMode, so the browser hands back its default (often 640x480) which is then stretched full-screen | Request width/height/frameRate as `ideal` hints (1920x1080 at 30) so capable cameras deliver HD; never use exact/min so weak cameras still open; guard with a unit test that the hints stay present |
 
+| Camera quality is tuned from guesses, not the real device | Simulated Chrome cannot show what a specific phone's browser delivers; hints were assumed to work | Camera-on readout shows the actually delivered track size, fps, facing, max offered and displayed size (describeCameraStream, unit-tested); read it from the real phone before claiming a model-specific result |
+
 | GitHub web upload silently renames files instead of replacing | Multi-file upload queue prefixed every file (1-README.md, 6-Reader.tsx); a mis-targeted filename fill containing '/' created a nested garbage path and CI failed on the mangled tree | Never use the upload page for replacements; edit/create one file at a time in the web editor, pick the editor ref by its 'file contents' label (not the filename field), then byte-compare each committed file via API and diff the whole repo tree against the expected file set before delivery |
 
 Review this file before each build; add actual mistakes with cause and a test that prevents recurrence.
